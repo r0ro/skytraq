@@ -367,12 +367,19 @@ class Venus6:
           | (data[offset + 4] << 12))
     offset += 6
 
-    ecef_x = data[offset + 1] + (data[offset] << 8) + (data[offset + 3] << 16) + (data[offset + 2] << 24);
+    ecef_x = data[offset + 1] + (data[offset] << 8) + (data[offset + 3] << 16) + (data[offset + 2] << 24)
     offset += 4
-    ecef_y = data[offset + 1] + (data[offset] << 8) + (data[offset + 3] << 16) + (data[offset + 2] << 24);
+    ecef_y = data[offset + 1] + (data[offset] << 8) + (data[offset + 3] << 16) + (data[offset + 2] << 24)
     offset += 4
-    ecef_z = data[offset + 1] + (data[offset] << 8) + (data[offset + 3] << 16) + (data[offset + 2] << 24);
+    ecef_z = data[offset + 1] + (data[offset] << 8) + (data[offset + 3] << 16) + (data[offset + 2] << 24)
     offset += 4
+
+    if ecef_x & 0x80000000:
+      ecef_x = ecef_x - (1<<32)
+    if ecef_y & 0x80000000:
+      ecef_y = ecef_y - (1<<32)
+    if ecef_z & 0x80000000:
+      ecef_z = ecef_z - (1<<32)
 
     # print(">> speed %d km/h" % speed)
     # print(">> wn %d" % wn)
