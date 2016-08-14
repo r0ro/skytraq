@@ -5,6 +5,7 @@ import time
 import datetime
 import math
 from ftplib import FTP
+import struct
 
 class Venus6:
   "Venus6 GPS object"
@@ -367,19 +368,17 @@ class Venus6:
           | (data[offset + 4] << 12))
     offset += 6
 
-    ecef_x = data[offset + 1] + (data[offset] << 8) + (data[offset + 3] << 16) + (data[offset + 2] << 24)
-    offset += 4
-    ecef_y = data[offset + 1] + (data[offset] << 8) + (data[offset + 3] << 16) + (data[offset + 2] << 24)
-    offset += 4
-    ecef_z = data[offset + 1] + (data[offset] << 8) + (data[offset + 3] << 16) + (data[offset + 2] << 24)
+    (d1, d2,) = struct.unpack_from(">Hh", data, offset)
+    ecef_x = d2 << 16 | d1
     offset += 4
 
-    if ecef_x & 0x80000000:
-      ecef_x = ecef_x - (1<<32)
-    if ecef_y & 0x80000000:
-      ecef_y = ecef_y - (1<<32)
-    if ecef_z & 0x80000000:
-      ecef_z = ecef_z - (1<<32)
+    (d1, d2,) = struct.unpack_from(">Hh", data, offset)
+    ecef_y = d2 << 16 | d1
+    offset += 4
+
+    (d1, d2,) = struct.unpack_from(">Hh", data, offset)
+    ecef_z = d2 << 16 | d1
+    offset += 4
 
     # print(">> speed %d km/h" % speed)
     # print(">> wn %d" % wn)
