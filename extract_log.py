@@ -46,33 +46,14 @@ if serial_speed != 115200:
   gps.setSerialSpeed(115200)
 
 entries = []
-for s in range(total_sector - sector_left):
-  print("start reading sector %d" % s)
-  data = gps.readLog(s, 1)
-  print("got data: ", data[0:32])
-  entries += Venus6.decodeLog(data)
+with open('raw.bin', 'wb') as raw:
+  for s in range(total_sector - sector_left + 1):
+    print("start reading sector %d" % s)
+    data = gps.readLog(s, 1)
+    print("got data: ", data[0:32])
+    raw.write(data)
 
-# dump entries to gpx file
-with open('dump.gpx', 'w') as gpx:
-
-  gpx.write("""<?xml version="1.0" encoding="UTF-8" standalone="no" ?>
-<gpx xmlns="http://www.topografix.com/GPX/1/1" creator="r0ro"
-  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd">
-  <trk>
-    <trkseg>
-
-  """)
-
-  for (date, lat, lon, alt, speed) in entries:
-    gpx.write('<trkpt lat="%f" lon="%f"><ele>%f</ele><time>%s</time><speed>%d</speed></trkpt>\n' %
-      (lat, lon, alt, date.isoformat(), speed))
-
-  gpx.write("""
-    </trkseg>
-  </trk>
-</gpx>""")
-
+print("Saved data to raw.bin")
 
 # restore serial speed
 if serial_speed != 115200:
